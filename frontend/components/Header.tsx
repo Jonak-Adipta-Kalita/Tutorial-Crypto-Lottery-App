@@ -11,7 +11,7 @@ const Header = () => {
       <div className="flex items-center space-x-2">
         <img
           className="rounded-full h-20 w-20"
-          src="https://i.imgur.com/4h7mAu7.png"
+          src="/favicon.ico"
           alt=""
         />
         <div className="">
