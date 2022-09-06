@@ -10,9 +10,13 @@ import {
   useContractData,
   useContractCall,
 } from "@thirdweb-dev/react";
+import Loading from "../components/Loading";
 
 const Home: NextPage = () => {
   const address = useAddress();
+  const { contract, isLoading } = useContract(
+    process.env.NEXT_PUBLIC_LOTTERY_CONTRACT_ADDRESS
+  );
 
   return (
     <>
@@ -20,12 +24,18 @@ const Home: NextPage = () => {
         <title>JAK Crypto Lottery App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {address ? (
-        <div className="bg-[#091B18] min-h-screen flex flex-col">
-          <Header />
-        </div>
+      {isLoading ? (
+        <Loading />
       ) : (
-        <Login />
+        <>
+          {address ? (
+            <div className="bg-[#091B18] min-h-screen flex flex-col">
+              <Header />
+            </div>
+          ) : (
+            <Login />
+          )}
+        </>
       )}
     </>
   );
