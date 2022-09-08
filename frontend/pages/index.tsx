@@ -11,7 +11,7 @@ import {
   useContractCall,
 } from "@thirdweb-dev/react";
 import Loading from "../components/Loading";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import CountDownTimer from "../components/CountDownTimer";
 import toast from "react-hot-toast";
@@ -34,10 +34,26 @@ const Home: NextPage = () => {
     contract,
     "ticketCommission"
   );
+  const { data: tickets } = useContractData(contract, "getTickets");
   const { data: expiration } = useContractData(contract, "expiration");
   const { mutateAsync: BuyTickets } = useContractCall(contract, "BuyTickets");
 
   const [quantity, setQuantity] = useState<number>(1);
+  const [userTickets, setUserTickets] = useState<number>(0);
+
+  useEffect(() => {
+    if (!tickets) return;
+
+    const totalTickets: string[] = tickets;
+
+    setUserTickets(
+      totalTickets.reduce(
+        (total, ticketAddress) =>
+          ticketAddress === address ? total + 1 : total,
+        0
+      )
+    );
+  }, [tickets, address]);
 
   const buyTicket = async () => {
     if (!ticketPrice) return;
