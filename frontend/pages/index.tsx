@@ -12,12 +12,28 @@ import {
 } from "@thirdweb-dev/react";
 import Loading from "../components/Loading";
 import { useState } from "react";
+import { ethers } from "ethers";
+import CountDownTimer from "../components/CountDownTimer";
 
 const Home: NextPage = () => {
   const address = useAddress();
   const { contract, isLoading } = useContract(
     process.env.NEXT_PUBLIC_LOTTERY_CONTRACT_ADDRESS
   );
+  const { data: remainingTickets } = useContractData(
+    contract,
+    "RemainingTickets"
+  );
+  const { data: currentWinningReward } = useContractData(
+    contract,
+    "CurrentWinningReward"
+  );
+  const { data: ticketPrice } = useContractData(contract, "ticketPrice");
+  const { data: ticketCommission } = useContractData(
+    contract,
+    "ticketCommission"
+  );
+  const { data: expiration } = useContractData(contract, "expiration");
   const [quantity, setQuantity] = useState<number>(1);
 
   return (
@@ -42,20 +58,36 @@ const Home: NextPage = () => {
                     <div className="flex justify-between p-2 space-x-2">
                       <div className="stats">
                         <h2 className="text-sm">Total Pool</h2>
-                        <p className="text-xl">0.1 MATIC</p>
+                        <p className="text-xl">
+                          {currentWinningReward &&
+                            ethers.utils.formatEther(
+                              currentWinningReward.toString()
+                            )}{" "}
+                          MATIC
+                        </p>
                       </div>
                       <div className="stats">
                         <h2 className="text-sm">Tickets Remaining</h2>
-                        <p className="text-xl">100</p>
+                        <p className="text-xl">
+                          {remainingTickets?.toNumber()}
+                        </p>
                       </div>
                     </div>
-                    {/* Countdown Timer */}
+                    <div className="mt-5 mb-3">
+                      <CountDownTimer />
+                    </div>
                   </div>
                   <div className="stats-container space-y-2">
                     <div className="stats-container">
                       <div className="flex justify-between items-center text-white pb-2">
                         <h2 className="">Price per Ticket</h2>
-                        <p className="">0.01 MATIC</p>
+                        <p className="">
+                          {ticketPrice &&
+                            ethers.utils.formatEther(
+                              ticketPrice.toString()
+                            )}{" "}
+                          MATIC
+                        </p>
                       </div>
                       <div className="flex text-white items-center space-x-2 bg-[#091818] border-[#004337] border p-4">
                         <p className="">TICKETS</p>
@@ -71,18 +103,36 @@ const Home: NextPage = () => {
                       <div className="space-y-2 mt-5">
                         <div className="stats-container-2-content font-extrabold text-sm">
                           <p className="">Total cost of Tickets</p>
-                          <p className="">0.999</p>
+                          <p className="">
+                            {ticketPrice &&
+                              Number(
+                                ethers.utils.formatEther(ticketPrice.toString())
+                              ) * quantity}
+                            MATIC
+                          </p>
                         </div>
                         <div className="stats-container-2-content">
                           <p className="">Service Fees</p>
-                          <p className="">0.001 MATIC</p>
+                          <p className="">
+                            {ticketCommission &&
+                              ethers.utils.formatEther(
+                                ticketCommission.toString()
+                              )}{" "}
+                            MATIC
+                          </p>
                         </div>
                         <div className="stats-container-2-content">
                           <p className="">+ Network Fees</p>
                           <p className="">TBC</p>
                         </div>
                       </div>
-                      <button className="mt-5 w-full bg-gradient-to-br from-orange-500 to-emerald-600 px-10 py-5 rounded-md text-white shadow-xl disabled:from-gray-600 disabled:to-gray-600 disabled:text-gray-100 disabled:cursor-not-allowed">
+                      <button
+                        disabled={
+                          expiration?.toString() < Date.now().toString() ||
+                          remainingTickets?.toNumber() === 0
+                        }
+                        className="mt-5 w-full bg-gradient-to-br from-orange-500 to-emerald-600 px-10 py-5 rounded-md text-white shadow-xl disabled:from-gray-600 disabled:to-gray-600 disabled:text-gray-100 disabled:cursor-not-allowed"
+                      >
                         Buy Tickets
                       </button>
                     </div>
