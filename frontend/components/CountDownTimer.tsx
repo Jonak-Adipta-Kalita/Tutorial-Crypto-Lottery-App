@@ -18,9 +18,25 @@ const CountDownTimer = () => {
           if (completed) {
             return (
               <div className="">
-                <h2 className="text-white">
+                <h2 className="text-white text-xl text-center animate-bounce">
                   Ticket Sales have now been CLOSED for this Draw.
                 </h2>
+                <div className="">
+                  <div className="flex space-x-6">
+                    <div className="flex-1">
+                      <div className="countdown animate-pulse">{hours}</div>
+                      <div className="countdown-label">hours</div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="countdown animate-pulse">{minutes}</div>
+                      <div className="countdown-label">minutes</div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="countdown animate-pulse">{seconds}</div>
+                      <div className="countdown-label">seconds</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             );
           } else {
