@@ -156,9 +156,15 @@ const Home: NextPage = () => {
                           remainingTickets?.toNumber() === 0
                         }
                         onClick={buyTicket}
-                        className="mt-5 w-full bg-gradient-to-br from-orange-500 to-emerald-600 px-10 py-5 rounded-md text-white shadow-xl disabled:from-gray-600 disabled:to-gray-600 disabled:text-gray-100 disabled:cursor-not-allowed"
+                        className="mt-5 w-full bg-gradient-to-br from-orange-500 to-emerald-600 px-10 py-5 rounded-md text-white shadow-xl disabled:from-gray-600 disabled:to-gray-600 disabled:text-gray-100 disabled:cursor-not-allowed font-semibold"
                       >
-                        Buy Tickets
+                        Buy {quantity} {quantity === 1 ? "ticket" : "tickets"}{" "}
+                        for{" "}
+                        {ticketPrice &&
+                          Number(
+                            ethers.utils.formatEther(ticketPrice?.toString())
+                          ) * quantity}{" "}
+                        MATIC
                       </button>
                     </div>
                   </div>
