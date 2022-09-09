@@ -37,6 +37,15 @@ const Home: NextPage = () => {
   const { data: tickets } = useContractData(contract, "getTickets");
   const { data: expiration } = useContractData(contract, "expiration");
   const { mutateAsync: BuyTickets } = useContractCall(contract, "BuyTickets");
+  const { mutateAsync: withdrawWinnings } = useContractCall(
+    contract,
+    "WithdrawWinnings"
+  );
+  const { data: winnings } = useContractData(
+    contract,
+    "getWinningsForAddress",
+    address
+  );
 
   const [quantity, setQuantity] = useState<number>(1);
   const [userTickets, setUserTickets] = useState<number>(0);
@@ -76,6 +85,18 @@ const Home: NextPage = () => {
     }
   };
 
+  const onWithdrawWinnings = async () => {
+    const notification = toast.loading("Withdrawing winnings...");
+
+    try {
+      const data = await withdrawWinnings([{}]);
+
+      toast.success("Money transfered!!", { id: notification });
+    } catch (err) {
+      toast.error("Oops... Something went Wrong...", { id: notification });
+    }
+  };
+
   return (
     <>
       <Head>
@@ -90,6 +111,24 @@ const Home: NextPage = () => {
             <div className="bg-[#091B18] min-h-screen flex flex-col">
               <div className="flex-1">
                 <Header />
+                {winnings > 0 && (
+                  <div className="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto mt-5">
+                    <button
+                      onClick={onWithdrawWinnings}
+                      className="p-5 bg-gradient-to-b from-orange-500 to-emerald-600 animate-pulse text-center rounded-xl w-full"
+                    >
+                      <p className="font-bold">
+                        Winner Winner, Chicken Dinner!
+                      </p>
+                      <p>
+                        Total Winnings:{" "}
+                        {ethers.utils.formatEther(winnings.toString())} MATIC
+                      </p>
+                      <br />
+                      <p className="font-semibold">Click here to Withdraw</p>
+                    </button>
+                  </div>
+                )}
                 <div className="space-y-5 md:space-y-0 m-5 md:flex md:flex-row items-start justify-center md:space-x-5">
                   <div className="stats-container">
                     <h1 className="text-5xl text-white font-semibold text-center">
@@ -183,9 +222,27 @@ const Home: NextPage = () => {
                         MATIC
                       </button>
                     </div>
+                    {userTickets > 0 && (
+                      <div className="stats">
+                        <p className="text-lg mb-2">
+                          You have {userTickets} Tickets in this Draw.
+                        </p>
+                        <div className="flex max-w-sm flex-wrap gap-x-2 gap-y-2">
+                          {Array(userTickets)
+                            .fill("")
+                            .map((_, index) => (
+                              <p
+                                key={index}
+                                className="text-emerald-300 h-20 w-12 bg-emerald-500/30 rounded-lg flex items-center justify-center text-xs italic"
+                              >
+                                {index + 1}
+                              </p>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className=""></div>
               </div>
             </div>
           ) : (
