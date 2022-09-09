@@ -4,8 +4,6 @@ import Header from "../components/Header";
 import Login from "../components/Login";
 import {
   useAddress,
-  useDisconnect,
-  useMetamask,
   useContract,
   useContractData,
   useContractCall,
@@ -15,6 +13,8 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import CountDownTimer from "../components/CountDownTimer";
 import toast from "react-hot-toast";
+import Marquee from "react-fast-marquee";
+import AdminControls from "../components/AdminControls";
 
 const Home: NextPage = () => {
   const address = useAddress();
@@ -45,6 +45,15 @@ const Home: NextPage = () => {
     contract,
     "getWinningsForAddress",
     address
+  );
+  const { data: lastWinner } = useContractData(contract, "lastWinner");
+  const { data: lastWinnerAmount } = useContractData(
+    contract,
+    "lastWinnerAmount"
+  );
+  const { data: lotteryOperator } = useContractData(
+    contract,
+    "lotteryOperator"
   );
 
   const [quantity, setQuantity] = useState<number>(1);
@@ -111,6 +120,30 @@ const Home: NextPage = () => {
             <div className="bg-[#091B18] min-h-screen flex flex-col">
               <div className="flex-1">
                 <Header />
+                <Marquee
+                  className="bg-[#0A1F1C] p-5 mb-5"
+                  gradient={false}
+                  speed={100}
+                >
+                  <div className="flex space-x-4 mx-10">
+                    <h4 className="text-white font-bold">
+                      Last Winner: {lastWinner?.toString()}
+                    </h4>
+                    <h4 className="text-white font-bold">
+                      Previous Winnings:{" "}
+                      {lastWinnerAmount &&
+                        ethers.utils.formatEther(
+                          lastWinnerAmount?.toString()
+                        )}{" "}
+                      MATIC
+                    </h4>
+                  </div>
+                </Marquee>
+                {lotteryOperator === address && (
+                  <div className="flex justify-center">
+                    <AdminControls />
+                  </div>
+                )}
                 {winnings > 0 && (
                   <div className="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto mt-5">
                     <button
